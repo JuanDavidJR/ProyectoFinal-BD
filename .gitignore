@@ -1,0 +1,67 @@
+# Entornos virtuales
+venv/
+env/
+.venv/
+venv*/
+ENV/
+env.bak/
+.venv.bak/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos de desarrollo y IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos de instalación y distribución
+*.egg-info/
+*.egg
+dist/
+build/
+pip-wheel-metadata/
+*.dist-info/
+*.manifest
+*.spec
+
+# Archivos de caché y logs
+*.log
+*.cache
+*.pot
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos de entorno
+.env
+.venv
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints/
+
+# Archivos de SQLite
+*.sqlite
+*.db
+
+# Archivos temporales
+*.tmp
+*.bak
+*~
+
+# Archivos SQL GEnerados
