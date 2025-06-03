@@ -1,0 +1,120 @@
+erDiagram
+
+    %% =======================
+    %%     ENTIDADES MÚSICA
+    %% =======================
+
+    vibesia_schema_artists {
+        int artist_id PK
+        varchar name "NN"
+        varchar country "NN"
+        int formation_year
+        text biography
+        varchar artist_type "NN"
+    }
+
+    vibesia_schema_albums {
+        int album_id PK
+        int artist_id FK "NN"
+        varchar title "NN"
+        int release_year "NN"
+        varchar record_label
+        varchar album_type "NN"
+        varchar cover_image
+    }
+
+    vibesia_schema_songs {
+        int song_id PK
+        int album_id FK "NN"
+        varchar title "NN"
+        int duration "NN"
+        int track_number "NN"
+        varchar composer
+        text lyrics
+        varchar audio_path "NN"
+    }
+
+    vibesia_schema_genres {
+        int genre_id PK
+        varchar name "NN"
+        text description
+    }
+
+    vibesia_schema_song_genres {
+        int song_id PK, FK
+        int genre_id PK, FK
+    }
+
+    %% =======================
+    %%     ENTIDADES USUARIOS
+    %% =======================
+
+    vibesia_schema_users {
+        int user_id PK
+        varchar username "NN"
+        varchar email "NN, UQ"
+        date registration_date "NN"
+        text preferences
+    }
+
+    vibesia_schema_playlists {
+        int playlist_id PK
+        int user_id FK "NN"
+        varchar name "NN"
+        date creation_date "NN"
+        text description
+        boolean status "NN, default:false"
+    }
+
+    vibesia_schema_playlist_songs {
+        int playlist_id PK, FK
+        int song_id PK, FK
+        int position "NN"
+    }
+
+    vibesia_schema_playback_history {
+        int playback_id PK
+        int user_id FK "NN"
+        int song_id FK "NN"
+        int device_id FK "NN"
+        timestamp playback_date "NN"
+        boolean completed "NN, default:false"
+        int rating
+    }
+
+    %% =======================
+    %%     ENTIDADES DISPOSITIVOS
+    %% =======================
+
+    vibesia_schema_devices {
+        int device_id PK
+        varchar device_type "NN"
+        varchar operating_system "NN"
+    }
+
+    vibesia_schema_user_device {
+        int user_id PK, FK
+        int device_id PK, FK
+        date registration_date "NN"
+        timestamp last_access "NN"
+    }
+
+    %% =======================
+    %%     RELACIONES
+    %% =======================
+
+    vibesia_schema_artists       ||--o{ vibesia_schema_albums : "artist_id"
+    vibesia_schema_albums        ||--o{ vibesia_schema_songs : "album_id"
+    vibesia_schema_songs         ||--o{ vibesia_schema_song_genres : "song_id"
+    vibesia_schema_genres        ||--o{ vibesia_schema_song_genres : "genre_id"
+
+    vibesia_schema_users         ||--o{ vibesia_schema_playlists : "user_id"
+    vibesia_schema_playlists     ||--o{ vibesia_schema_playlist_songs : "playlist_id"
+    vibesia_schema_songs         ||--o{ vibesia_schema_playlist_songs : "song_id"
+
+    vibesia_schema_users         ||--o{ vibesia_schema_user_device : "user_id"
+    vibesia_schema_devices       ||--o{ vibesia_schema_user_device : "device_id"
+
+    vibesia_schema_users         ||--o{ vibesia_schema_playback_history : "user_id"
+    vibesia_schema_songs         ||--o{ vibesia_schema_playback_history : "song_id"
+    vibesia_schema_devices       ||--o{ vibesia_schema_playback_history : "device_id"

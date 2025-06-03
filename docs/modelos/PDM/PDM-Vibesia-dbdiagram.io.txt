@@ -1,0 +1,122 @@
+Table vibesia_schema.artists {
+  artist_id int [pk, increment]
+  name varchar(100) [not null]
+  country varchar(50) [not null]
+  formation_year int
+  biography text
+  artist_type varchar(30) [not null]
+  popularity int [default: 0]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table vibesia_schema.genres {
+  genre_id int [pk, increment]
+  name varchar(50) [not null, unique]
+  description text
+}
+
+Table vibesia_schema.users {
+  user_id int [pk, increment]
+  username varchar(50) [not null, unique]
+  email varchar(100) [not null, unique]
+  registration_date date [not null, default: `CURRENT_DATE`]
+  preferences text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table vibesia_schema.albums {
+  album_id int [pk, increment]
+  artist_id int [not null, ref: > vibesia_schema.artists.artist_id]
+  title varchar(150) [not null]
+  release_year int
+  record_label varchar(100)
+  album_type varchar(30) [not null]
+  cover_image varchar(255)
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table vibesia_schema.songs {
+  song_id int [pk, increment]
+  album_id int [not null, ref: > vibesia_schema.albums.album_id]
+  title varchar(150) [not null]
+  duration int [not null]
+  track_number int
+  composer varchar(100)
+  lyrics text
+  audio_path varchar(255) [not null]
+  explicit_content boolean [default: false]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table vibesia_schema.playlists {
+  playlist_id int [pk, increment]
+  user_id int [not null, ref: > vibesia_schema.users.user_id]
+  name varchar(100) [not null]
+  description text
+  creation_date timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  status varchar(20) [not null, default: 'private']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (name, user_id) [unique, name: "uk_playlist_user_name"]
+  }
+}
+
+Table vibesia_schema.devices {
+  device_id int [pk, increment]
+  device_type varchar(30) [not null]
+  operating_system varchar(50)
+}
+
+Table vibesia_schema.song_genres {
+  song_id int [not null, ref: > vibesia_schema.songs.song_id]
+  genre_id int [not null, ref: > vibesia_schema.genres.genre_id]
+
+  indexes {
+    (song_id, genre_id) [pk]
+  }
+}
+
+Table vibesia_schema.playlist_songs {
+  playlist_id int [not null, ref: > vibesia_schema.playlists.playlist_id]
+  song_id int [not null, ref: > vibesia_schema.songs.song_id]
+  position int [not null]
+  date_added timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (playlist_id, song_id) [pk]
+  }
+}
+
+Table vibesia_schema.user_device {
+  user_id int [not null, ref: > vibesia_schema.users.user_id]
+  device_id int [not null, ref: > vibesia_schema.devices.device_id]
+  registration_date date [not null, default: `CURRENT_DATE`]
+  last_access timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  last_reproduction_date timestamp
+
+  indexes {
+    (user_id, device_id) [pk]
+  }
+}
+
+Table vibesia_schema.playback_history {
+  playback_id int [pk, increment]
+  user_id int [not null, ref: > vibesia_schema.users.user_id]
+  song_id int [not null, ref: > vibesia_schema.songs.song_id]
+  device_id int [not null, ref: > vibesia_schema.devices.device_id]
+  playback_date timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  completed boolean [not null, default: false]
+  rating int
+
+  indexes {
+    (user_id, song_id, playback_date) [unique, name: "playback_unique_user_song_time"]
+  }
+}
+
+
