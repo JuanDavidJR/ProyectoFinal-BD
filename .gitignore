@@ -63,5 +63,5 @@ Thumbs.db
 *.tmp
 *.bak
 *~
-
-# Archivos SQL GEnerados
+# Ignore all .gitkeep files
+**/.gitkeep
