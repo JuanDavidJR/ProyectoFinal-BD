@@ -1,0 +1,22 @@
+
+INSERT INTO vibesia_schema.artists (name, country, formation_year, biography, artist_type, popularity) VALUES
+('Queen', 'United Kingdom', 1970, 'British rock band formed in London in 1970, known for their musical diversity and theatrical performances.', 'band', 95),
+('Michael Jackson', 'United States', 1964, 'Known as the "King of Pop", he was an American singer, songwriter, and dancer.', 'soloist', 98),
+('Daft Punk', 'France', 1993, 'Electronic music duo known for their unique style and robot helmet performances.', 'collective', 88),
+('Coldplay', 'United Kingdom', 1996, 'British alternative rock band formed in London.', 'band', 90),
+('Beyoncé', 'United States', 1997, 'American singer, songwriter, and actress who began her career as a member of Destiny''s Child.', 'soloist', 94),
+('Metallica', 'United States', 1981, 'American heavy metal band, considered one of the "big four" of thrash metal.', 'band', 87),
+('Bad Bunny', 'Puerto Rico', 2013, 'Puerto Rican singer, songwriter, and producer of trap and reggaeton.', 'soloist', 93),
+('Radiohead', 'United Kingdom', 1985, 'British alternative rock band formed in Abingdon, Oxfordshire.', 'band', 85),
+('Nina Simone', 'United States', 1954, 'American singer, songwriter, and pianist, known for her broad musical repertoire.', 'soloist', 82),
+('Bob Marley & The Wailers', 'Jamaica', 1963, 'Jamaican reggae band led by Bob Marley until his death in 1981.', 'band', 89),
+('The Beatles', 'United Kingdom', 1960, 'Pioneering British rock band, considered the most influential of all time.', 'band', 96),
+('Mozart', 'Austria', 1762, 'Wolfgang Amadeus Mozart was a prolific and prominent composer of the Classical period.', 'soloist', 85),
+('David Guetta', 'France', 1984, 'French DJ and music producer, a pioneer of house music in his country.', 'soloist', 86),
+('Gustavo Cerati', 'Argentina', 1982, 'Argentine musician, singer-songwriter, and record producer, leader of Soda Stereo.', 'soloist', 84),
+('Shakira', 'Colombia', 1990, 'Colombian singer-songwriter, dancer, and businesswoman, recognized for her musical versatility.', 'soloist', 92),
+('J Balvin', 'Colombia', 2004, 'Colombian reggaeton singer and songwriter, considered one of the best-selling Latin artists.', 'soloist', 88),
+('Dua Lipa', 'United Kingdom', 2015, 'British singer, songwriter, and model of Albanian-Kosovar origin.', 'soloist', 89),
+('The Weeknd', 'Canada', 2010, 'Canadian singer, songwriter, and producer of R&B and pop.', 'soloist', 91),
+('Björk', 'Iceland', 1977, 'Icelandic singer, songwriter, and producer known for her avant-garde style.', 'soloist', 79),
+('Karol G', 'Colombia', 2006, 'Colombian singer and songwriter of reggaeton and Latin trap.', 'soloist', 90);
