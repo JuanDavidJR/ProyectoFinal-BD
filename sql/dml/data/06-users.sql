@@ -1,0 +1,22 @@
+
+INSERT INTO vibesia_schema.users (username, email, registration_date, preferences) VALUES
+('musiclover94', 'maria@example.com', '2020-01-15', 'Rock, Pop, Indie'),
+('beatlesfan', 'juan@example.com', '2020-02-10', 'Rock, Jazz, Classical'),
+('electronix', 'ana@example.com', '2020-03-05', 'Electronic, Techno, Disco'),
+('metalhead', 'carlos@example.com', '2020-04-20', 'Metal, Rock, Punk'),
+('jazzmaster', 'sofia@example.com', '2020-05-12', 'Jazz, Blues, Soul'),
+('reggaevibes', 'daniel@example.com', '2020-06-08', 'Reggae, Reggaeton, Hip-Hop'),
+('popstar', 'laura@example.com', '2020-07-25', 'Pop, R&B, Soul'),
+('rocknroll', 'diego@example.com', '2020-08-14', 'Rock, Metal, Punk'),
+('classicalguru', 'valentina@example.com', '2020-09-30', 'Classical, Jazz'),
+('urbanrhythm', 'alejandro@example.com', '2020-10-22', 'Hip-Hop, R&B, Trap'),
+('latinapower', 'camila@example.com', '2020-11-05', 'Reggaeton, Latin Pop, Latin Trap'),
+('indiefolk', 'mateo@example.com', '2020-12-18', 'Indie, Folk, Alternative Rock'),
+('basshead', 'lucia@example.com', '2021-01-07', 'Electronic, Dubstep, Trap'),
+('vinylcollector', 'javier@example.com', '2021-02-14', 'Classic Rock, Jazz, Blues'),
+('dancequeen', 'isabella@example.com', '2021-03-22', 'Pop, Disco, Electronic'),
+('guitarking', 'gabriel@example.com', '2021-04-11', 'Rock, Metal, Blues'),
+('pianoplayer', 'emma@example.com', '2021-05-05', 'Classical, Jazz, Lounge'),
+('rapflow', 'nicolas@example.com', '2021-06-17', 'Hip-Hop, Trap, Rap'),
+('soulstrings', 'valeria@example.com', '2021-07-09', 'Soul, R&B, Jazz'),
+('djmixer', 'samuel@example.com', '2021-08-30', 'Electronic, House, Techno');

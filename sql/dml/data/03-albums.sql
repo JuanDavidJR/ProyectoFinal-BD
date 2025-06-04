@@ -1,0 +1,22 @@
+
+INSERT INTO vibesia_schema.albums (artist_id, title, release_year, record_label, album_type, cover_image) VALUES
+(1, 'A Night at the Opera', 1975, 'EMI Records', 'studio', '/covers/queen_night_at_the_opera.jpg'),
+(1, 'News of the World', 1977, 'EMI Records', 'studio', '/covers/queen_news_of_the_world.jpg'),
+(2, 'Thriller', 1982, 'Epic Records', 'studio', '/covers/michael_jackson_thriller.jpg'),
+(2, 'Bad', 1987, 'Epic Records', 'studio', '/covers/michael_jackson_bad.jpg'),
+(3, 'Discovery', 2001, 'Virgin Records', 'studio', '/covers/daft_punk_discovery.jpg'),
+(3, 'Random Access Memories', 2013, 'Columbia Records', 'studio', '/covers/daft_punk_random_access_memories.jpg'),
+(4, 'Parachutes', 2000, 'Parlophone', 'studio', '/covers/coldplay_parachutes.jpg'),
+(4, 'A Rush of Blood to the Head', 2002, 'Parlophone', 'studio', '/covers/coldplay_rush_of_blood.jpg'),
+(5, 'Dangerously in Love', 2003, 'Columbia Records', 'studio', '/covers/beyonce_dangerously_in_love.jpg'),
+(5, 'Lemonade', 2016, 'Parkwood Entertainment', 'studio', '/covers/beyonce_lemonade.jpg'),
+(6, 'Master of Puppets', 1986, 'Elektra Records', 'studio', '/covers/metallica_master_of_puppets.jpg'),
+(6, 'Metallica (The Black Album)', 1991, 'Elektra Records', 'studio', '/covers/metallica_black_album.jpg'),
+(7, 'YHLQMDLG', 2020, 'Rimas Entertainment', 'studio', '/covers/bad_bunny_yhlqmdlg.jpg'),
+(7, 'Un Verano Sin Ti', 2022, 'Rimas Entertainment', 'studio', '/covers/bad_bunny_un_verano_sin_ti.jpg'),
+(8, 'OK Computer', 1997, 'Parlophone', 'studio', '/covers/radiohead_ok_computer.jpg'),
+(8, 'Kid A', 2000, 'Parlophone', 'studio', '/covers/radiohead_kid_a.jpg'),
+(9, 'I Put a Spell on You', 1965, 'Philips Records', 'studio', '/covers/nina_simone_spell_on_you.jpg'),
+(10, 'Exodus', 1977, 'Island Records', 'studio', '/covers/bob_marley_exodus.jpg'),
+(11, 'Abbey Road', 1969, 'Apple Records', 'studio', '/covers/beatles_abbey_road.jpg'),
+(12, 'Mozart''s Greatest Hits', 1985, 'Deutsche Grammophon', 'compilation', '/covers/mozart_greatest_hits.jpg');

@@ -1,0 +1,23 @@
+
+INSERT INTO vibesia_schema.playlists (user_id, name, creation_date, description, status) VALUES
+(1, 'Classic Rock Anthems', '2021-01-20', 'My all-time favorite rock tracks', 'public'),
+(1, 'Work Focus Mix', '2021-02-15', 'Music to concentrate while working', 'private'),
+(2, 'Beatles & Beyond', '2021-03-10', 'The best of The Beatles and similar bands', 'public'),
+(3, 'Electronic Dreams', '2021-04-05', 'Electronic music for daydreaming', 'public'),
+(4, 'Headbangers Ball', '2021-05-12', 'Metal to shake your head to', 'public'),
+(5, 'Late Night Jazz', '2021-06-18', 'Jazz for quiet nights', 'private'),
+(6, 'Roots & Culture Vibes', '2021-07-22', 'Reggae and music with cultural roots', 'public'),
+(7, 'Pop Party Starter', '2021-08-30', 'Danceable pop music for parties', 'public'),
+(8, 'Alternative Rock Gems', '2021-09-14', 'The best of alternative rock', 'private'),
+(9, 'Immortal Classics', '2021-10-25', 'Masterpieces of classical music', 'public'),
+(10, 'Urban Beats Flow', '2021-11-08', 'Contemporary urban rhythms', 'public'),
+(11, 'Intense Reggaeton Mix', '2021-12-12', 'Reggaeton and Latin trap for dancing', 'public'),
+(12, 'Indie Discoveries Weekly', '2022-01-05', 'Lesser-known indie gems', 'private'),
+(13, 'EDM Festival Energy', '2022-02-18', 'Like being at an electronic music festival', 'public'),
+(14, 'Vintage Vinyl Classics', '2022-03-24', 'Classics that sound better on vinyl', 'public'),
+(15, 'Ultimate Dance Floor', '2022-04-10', 'Don''t stop dancing', 'public'),
+(16, 'Guitar Heroes Showcase', '2022-05-15', 'The best guitar solos ever', 'private'),
+(17, 'Piano Moodscapes', '2022-06-20', 'Relaxing piano melodies', 'public'),
+(18, 'Hip-Hop Evolution Journey', '2022-07-08', 'The evolution of hip-hop through the years', 'public'),
+(19, 'Soul Sisters Anthems', '2022-08-12', 'The great female voices of soul', 'private'),
+(20, 'My DJ Night Set', '2022-09-30', 'My DJ set for the night', 'public');
