@@ -1,6 +1,6 @@
 # Pipeline to Automate SQL Script Execution in PostgreSQL
 
-This Python script automates the execution of SQL files to create databases, schemas, and tables in PostgreSQL. It's especially useful for quickly setting up the **fintech** database environment for a credit card system.
+This Python script automates the execution of SQL files to create databases, schemas, and tables in PostgreSQL. It's especially useful for quickly setting up the **musicdb** database environment for a credit card system.
 
 ## Requirements
 
