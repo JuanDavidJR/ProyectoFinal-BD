@@ -198,27 +198,34 @@ ALTER TABLE vibesia_schema.user_device  ADD CONSTRAINT fk_user_device_devices
 --##################################################
 --#                AUDIT TABLE                     #
 --##################################################
-
 -- Table: vibesia_schema.audit_log
 -- Brief: Audit table to track all CRUD operations on system tables
 CREATE TABLE vibesia_schema.audit_log (
     audit_id SERIAL PRIMARY KEY,
-    user_name VARCHAR(100) NOT NULL,                    
+    db_user_name VARCHAR(100) NOT NULL DEFAULT SESSION_USER,
+    app_user_id INTEGER,                           
+    app_user_email VARCHAR(255),                     
+    app_user_role VARCHAR(50),
     action_type VARCHAR(10) NOT NULL CHECK (action_type IN ('INSERT', 'UPDATE', 'DELETE')), 
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-    table_name VARCHAR(50) NOT NULL,
-    record_id INTEGER,                    
-    old_values JSONB,                                   
-    new_values JSONB,                                   
-    connection_ip INET                              
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    table_name VARCHAR(50) NOT NULL,                
+    record_id INTEGER, 
+    old_values JSONB,                               
+    new_values JSONB, 
+    connection_ip INET,               
+    user_agent TEXT,                                 
+    api_endpoint VARCHAR(255),      
+    request_id VARCHAR(100),
+    application_name VARCHAR(50) DEFAULT 'vibesia_app',
+    environment VARCHAR(20) DEFAULT 'production',
+    CONSTRAINT fk_app_user FOREIGN KEY (app_user_id) REFERENCES vibesia_schema.users(user_id) ON DELETE SET NULL
 );
 
--- Indexes for the audit table
-CREATE INDEX idx_audit_log_user_name ON vibesia_schema.audit_log(user_name);
-CREATE INDEX idx_audit_log_action_type ON vibesia_schema.audit_log(action_type);
-CREATE INDEX idx_audit_log_timestamp ON vibesia_schema.audit_log(timestamp);
-CREATE INDEX idx_audit_log_table_name ON vibesia_schema.audit_log(table_name);
-
+CREATE INDEX idx_audit_log_app_user_id ON vibesia_schema.audit_log (app_user_id);
+CREATE INDEX idx_audit_log_timestamp ON vibesia_schema.audit_log (timestamp);
+CREATE INDEX idx_audit_log_table_name ON vibesia_schema.audit_log (table_name);
+CREATE INDEX idx_audit_log_action_type ON vibesia_schema.audit_log (action_type);
+CREATE INDEX idx_audit_log_record_id ON vibesia_schema.audit_log (table_name, record_id);
 
 --##################################################
 --#                CREATE INDEXES                  #
