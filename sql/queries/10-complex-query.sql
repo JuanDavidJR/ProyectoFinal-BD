@@ -1,19 +1,11 @@
 -- --------------------------------------------------------------------
 -- Query 10: PREDICTIVE USER CHURN ANALYSIS
 -- --------------------------------------------------------------------
--- Objective: Identify users at risk of leaving the platform (churn) by analyzing
--- their recent behavior, activity trends, and engagement metrics.
--- Techniques:
---   - Two CTEs: `user_behavior_metrics` to calculate a wide range of metrics per user
---             and `churn_analysis` to calculate risk scores and segmentation.
---   - Extensive correlated scalar subqueries to obtain activity, engagement, and diversity metrics.
---   - Complex temporal analysis: comparison of activity in different periods (last 7, 30, 60, 90 days).
---   - CASE to calculate `activity_trend_pct`, `churn_risk_score`, `activity_segment`,
---          `recommended_action`, and `user_segment`.
---   - Window functions: DENSE_RANK() to prioritize users based on risk.
--- Result: A detailed report per user with their activity segment, churn risk score,
--- activity trend, key behavior metrics, recommended action, and a user segment
--- for targeted strategies. Users are ordered by intervention priority.
+-- Objective: Identify users at risk of churn by analyzing recent behavior, activity trends, and engagement.
+-- Techniques: CTEs, Correlated Subqueries, Temporal Analysis (activity in last 7, 30, 60, 90 days),
+--             CASE for risk scores and segmentation, Window Functions (DENSE_RANK).
+-- Result: Report per user: activity segment, churn risk score, activity trend, key metrics,
+--         recommended action, user segment for targeted strategies, ordered by intervention priority.
 -- --------------------------------------------------------------------
 WITH user_behavior_metrics AS (
     SELECT
@@ -21,163 +13,135 @@ WITH user_behavior_metrics AS (
         u.username,
         u.registration_date,
         u.email,
-        EXTRACT(DAYS FROM CURRENT_DATE - u.registration_date) AS days_since_registration, -- User tenure
+        (CURRENT_DATE - u.registration_date) AS days_since_registration, -- User tenure (Corrected)
 
-        -- Recent activity metrics
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph1
          WHERE ph1.user_id = u.user_id
-           AND ph1.playback_date >= CURRENT_DATE - INTERVAL '7 days') AS plays_last_7_days, -- Plays in the last 7 days
+           AND ph1.playback_date >= CURRENT_DATE - INTERVAL '7 days') AS plays_last_7_days,
 
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph2
          WHERE ph2.user_id = u.user_id
-           AND ph2.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS plays_last_30_days, -- Plays in the last 30 days
+           AND ph2.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS plays_last_30_days,
 
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph3
          WHERE ph3.user_id = u.user_id
-           AND ph3.playback_date >= CURRENT_DATE - INTERVAL '90 days') AS plays_last_90_days, -- Plays in the last 90 days
+           AND ph3.playback_date >= CURRENT_DATE - INTERVAL '90 days') AS plays_last_90_days,
 
-        -- Days since last activity
-        (SELECT EXTRACT(DAYS FROM CURRENT_DATE - MAX(ph4.playback_date))
-         FROM vibesia_schema.playback_history ph4
-         WHERE ph4.user_id = u.user_id) AS days_since_last_play, -- Days since last playback
+        COALESCE((SELECT EXTRACT(DAY FROM (CURRENT_TIMESTAMP - MAX(ph4.playback_date))) -- Use CURRENT_TIMESTAMP for interval with timestamp
+                  FROM vibesia_schema.playback_history ph4
+                  WHERE ph4.user_id = u.user_id), 9999) AS days_since_last_play, -- Corrected & COALESCE for users with no plays
 
-        -- Activity trend (period comparison)
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph5
          WHERE ph5.user_id = u.user_id
            AND ph5.playback_date >= CURRENT_DATE - INTERVAL '60 days'
-           AND ph5.playback_date < CURRENT_DATE - INTERVAL '30 days') AS plays_30_60_days_ago, -- Plays between 30 and 60 days ago
+           AND ph5.playback_date < CURRENT_DATE - INTERVAL '30 days') AS plays_30_60_days_ago,
 
-        -- Engagement metrics
-        (SELECT AVG(CASE WHEN ph6.completed THEN 1.0 ELSE 0.0 END)
-         FROM vibesia_schema.playback_history ph6
-         WHERE ph6.user_id = u.user_id
-           AND ph6.playback_date >= CURRENT_DATE - INTERVAL '90 days') AS completion_rate_last_90_days, -- Completion rate in the last 90 days
+        COALESCE((SELECT AVG(CASE WHEN ph6.completed THEN 1.0 ELSE 0.0 END)
+                 FROM vibesia_schema.playback_history ph6
+                 WHERE ph6.user_id = u.user_id
+                   AND ph6.playback_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS completion_rate_last_90_days, -- COALESCE for no recent plays
 
         (SELECT COUNT(DISTINCT ph7.song_id)
          FROM vibesia_schema.playback_history ph7
          WHERE ph7.user_id = u.user_id
-           AND ph7.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS unique_songs_last_30_days, -- Unique songs listened to in the last 30 days
+           AND ph7.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS unique_songs_last_30_days,
 
-        -- Playlist activity
         (SELECT COUNT(*)
          FROM vibesia_schema.playlists p1
          WHERE p1.user_id = u.user_id
-           AND p1.creation_date >= CURRENT_DATE - INTERVAL '60 days') AS playlists_created_last_60_days, -- Playlists created in the last 60 days
+           AND p1.creation_date >= CURRENT_DATE - INTERVAL '60 days') AS playlists_created_last_60_days,
 
         (SELECT MAX(ps.date_added)
          FROM vibesia_schema.playlists p2
          JOIN vibesia_schema.playlist_songs ps ON p2.playlist_id = ps.playlist_id
-         WHERE p2.user_id = u.user_id) AS last_playlist_activity, -- Date of last playlist activity (song addition)
+         WHERE p2.user_id = u.user_id) AS last_playlist_activity,
 
-        -- Consumption diversity
         (SELECT COUNT(DISTINCT d.device_id)
          FROM vibesia_schema.playback_history ph8
          JOIN vibesia_schema.devices d ON ph8.device_id = d.device_id
          WHERE ph8.user_id = u.user_id
-           AND ph8.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS devices_used_last_30_days, -- Devices used in the last 30 days
+           AND ph8.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS devices_used_last_30_days,
 
-        -- Rating pattern
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph9
          WHERE ph9.user_id = u.user_id
            AND ph9.rating IS NOT NULL
-           AND ph9.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS ratings_given_last_30_days, -- Ratings given in the last 30 days
+           AND ph9.playback_date >= CURRENT_DATE - INTERVAL '30 days') AS ratings_given_last_30_days,
 
-        -- Total historical activity for context
         (SELECT COUNT(*)
          FROM vibesia_schema.playback_history ph10
-         WHERE ph10.user_id = u.user_id) AS total_lifetime_plays -- Total historical plays
+         WHERE ph10.user_id = u.user_id) AS total_lifetime_plays
     FROM vibesia_schema.users u
     WHERE u.is_active = TRUE
-        AND u.registration_date <= CURRENT_DATE - INTERVAL '30 days'  -- At least 30 days old
+      AND u.registration_date <= CURRENT_DATE - INTERVAL '30 days' -- Consider users registered at least 30 days ago
 ),
 churn_analysis AS (
-    SELECT *,
-        -- Activity trend calculation
+    SELECT
+        ubm.*,
         CASE
-            WHEN plays_last_30_days > 0 AND plays_30_60_days_ago > 0
+            WHEN plays_30_60_days_ago > 0 -- Avoid division by zero if no activity in prior period
             THEN ROUND(((plays_last_30_days - plays_30_60_days_ago)::DECIMAL / plays_30_60_days_ago * 100), 2)
-            ELSE NULL
-        END AS activity_trend_pct, -- Activity trend (last 30d vs 30-60d ago)
+            WHEN plays_last_30_days > 0 AND plays_30_60_days_ago = 0 THEN 100.00 -- Infinite growth, represented as 100% or some large number
+            ELSE 0.00 -- No activity in either period or only in prior
+        END AS activity_trend_pct,
 
-        -- Churn risk score (simplified, heuristic)
         CASE
-            WHEN days_since_last_play > 60 THEN 100 -- Very high risk
-            WHEN days_since_last_play > 30 THEN 80  -- High risk
-            WHEN days_since_last_play > 14 THEN 60  -- Moderate-high risk
-            WHEN plays_last_7_days = 0 AND plays_last_30_days < 5 THEN 70 -- Concerning recent inactivity
-            WHEN plays_last_30_days < plays_30_60_days_ago * 0.5 THEN 50 -- Significant drop in activity
-            WHEN completion_rate_last_90_days < 0.3 THEN 40 -- Low engagement
-            ELSE 20 -- Low risk
-        END AS churn_risk_score, -- Churn risk score
+            WHEN days_since_last_play > 60 THEN 100
+            WHEN days_since_last_play > 30 THEN 80
+            WHEN days_since_last_play > 14 THEN 60
+            WHEN plays_last_7_days = 0 AND plays_last_30_days < 5 AND days_since_registration > 30 THEN 70 -- Added tenure check for new users
+            WHEN plays_last_30_days < plays_30_60_days_ago * 0.5 AND plays_30_60_days_ago > 0 THEN 50 -- Added check for plays_30_60_days_ago > 0
+            WHEN COALESCE(completion_rate_last_90_days, 0) < 0.3 AND plays_last_90_days > 0 THEN 40 -- Check plays_last_90_days to ensure it's relevant
+            ELSE 20
+        END AS churn_risk_score,
 
-        -- User classification
         CASE
             WHEN plays_last_7_days > 10 THEN 'Very Active'
             WHEN plays_last_7_days > 3 THEN 'Active'
             WHEN plays_last_30_days > 0 THEN 'Moderately Active'
-            WHEN plays_last_90_days > 0 THEN 'At Risk'
+            WHEN plays_last_90_days > 0 AND days_since_last_play > 7 THEN 'At Risk' -- More specific "At Risk"
             ELSE 'Inactive'
-        END AS activity_segment -- User activity segment
-    FROM user_behavior_metrics
+        END AS activity_segment
+    FROM user_behavior_metrics ubm
 )
 SELECT
-    username,
-    registration_date,
-    days_since_registration,
-    activity_segment,
-    plays_last_7_days,
-    plays_last_30_days,
-    plays_last_90_days,
-    days_since_last_play,
-    activity_trend_pct,
-    churn_risk_score,
-    ROUND(completion_rate_last_90_days * 100, 2) AS completion_rate_pct,
-    unique_songs_last_30_days,
-    playlists_created_last_60_days,
-    devices_used_last_30_days,
-    ratings_given_last_30_days,
-    total_lifetime_plays,
-
-    -- Action recommendations based on profile
+    ca.username,
+    ca.registration_date,
+    ca.days_since_registration,
+    ca.activity_segment,
+    ca.plays_last_7_days,
+    ca.plays_last_30_days,
+    ca.plays_last_90_days,
+    CASE WHEN ca.days_since_last_play = 9999 THEN NULL ELSE ca.days_since_last_play END AS days_since_last_play, -- Show NULL if never played
+    ca.activity_trend_pct,
+    ca.churn_risk_score,
+    ROUND(COALESCE(ca.completion_rate_last_90_days,0) * 100, 2) AS completion_rate_pct,
+    ca.unique_songs_last_30_days,
+    ca.playlists_created_last_60_days,
+    ca.devices_used_last_30_days,
+    ca.ratings_given_last_30_days,
+    ca.total_lifetime_plays,
     CASE
-        WHEN churn_risk_score >= 80 THEN 'Urgent Reactivation Campaign'
-        WHEN churn_risk_score >= 60 THEN 'Retention Program'
-        WHEN churn_risk_score >= 40 THEN 'Personalized Engagement'
-        WHEN activity_segment = 'Very Active' THEN 'Loyalty Program'
-        ELSE 'Regular Maintenance'
-    END AS recommended_action, -- Recommended action
-
-    -- Segmentation for targeted strategies
+        WHEN ca.churn_risk_score >= 80 THEN 'Urgent Reactivation Campaign'
+        WHEN ca.churn_risk_score >= 60 THEN 'Retention Program Offer'
+        WHEN ca.churn_risk_score >= 40 THEN 'Personalized Engagement/Survey'
+        WHEN ca.activity_segment = 'Very Active' THEN 'VIP/Loyalty Acknowledgment'
+        ELSE 'Monitor/Regular Updates'
+    END AS recommended_action,
     CASE
-        WHEN total_lifetime_plays > 1000 AND churn_risk_score > 50 THEN 'VIP At Risk'
-        WHEN days_since_registration < 90 AND plays_last_30_days = 0 THEN 'Lost New User'
-        WHEN playlists_created_last_60_days > 0 AND plays_last_7_days = 0 THEN 'Inactive Curator'
-        WHEN completion_rate_last_90_days < 0.5 AND plays_last_30_days > 20 THEN 'Shallow Listener'
-        ELSE 'Standard User'
-    END AS user_segment, -- User segment for marketing
-
-    DENSE_RANK() OVER (ORDER BY churn_risk_score DESC, days_since_last_play DESC) AS priority_rank -- Priority rank for intervention
-
-FROM churn_analysis
-WHERE total_lifetime_plays > 0 -- Only users with some historical activity
-ORDER BY churn_risk_score DESC, days_since_last_play DESC, total_lifetime_plays DESC;
-
-
-
--- ====================================================================
--- SUMMARY OF CAPABILITIES DEMONSTRATED:
--- ====================================================================
--- ✅ MULTIPLE JOINS: All queries use multiple JOINs (3-6 tables per query)
--- ✅ CORRELATED SUBQUERIES: Extensive use in queries 2, 5, 7, 8, 10 with external references
--- ✅ ADVANCED AGGREGATIONS: COUNT, AVG, SUM, STDDEV, window functions (RANK, DENSE_RANK, LAG)
--- ✅ DATE/TIME OPERATIONS: EXTRACT, DATE_TRUNC, INTERVAL, complex temporal comparisons
--- ✅ PREDICTIVE ANALYSIS (BASIC): Trend metrics, risk scoring, segmentation for churn
--- ✅ WINDOW FUNCTIONS: ROW_NUMBER, RANK, DENSE_RANK, LAG, partitioning
--- ✅ COMPLEX CTEs: Extensive use of WITH to structure complex queries
--- ✅ STATISTICAL ANALYSIS: Standard deviation, conditional averages, comparisons
--- ====================================================================
+        WHEN ca.total_lifetime_plays > 500 AND ca.churn_risk_score >= 60 THEN 'High-Value At Risk' -- Adjusted threshold
+        WHEN ca.days_since_registration < 90 AND ca.plays_last_30_days = 0 AND ca.total_lifetime_plays > 0 THEN 'Lost New Engaged User' -- Was engaged then lost
+        WHEN ca.days_since_registration < 60 AND ca.total_lifetime_plays = 0 THEN 'Never Engaged New User'
+        WHEN ca.playlists_created_last_60_days > 0 AND ca.plays_last_7_days = 0 AND ca.plays_last_30_days > 0 THEN 'Curator Lapsing' -- Was active recently
+        WHEN COALESCE(ca.completion_rate_last_90_days,1) < 0.5 AND ca.plays_last_30_days > 10 THEN 'Frequent Skimmer' -- Adjusted threshold
+        ELSE 'Standard'
+    END AS user_segment,
+    DENSE_RANK() OVER (ORDER BY ca.churn_risk_score DESC, ca.days_since_last_play DESC NULLS LAST) AS priority_rank
+FROM churn_analysis ca
+WHERE ca.total_lifetime_plays >= 0 -- Consider all users who meet the CTE criteria (e.g. registered > 30 days)
+  -- AND ca.churn_risk_score >= 20 -- Optional: to only see users with some level of risk or specific segments
+ORDER BY priority_rank, ca.churn_risk_score DESC, ca.days_since_last_play DESC NULLS LAST, ca.total_lifetime_plays DESC;
