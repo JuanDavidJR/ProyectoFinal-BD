@@ -218,7 +218,6 @@ CREATE TABLE vibesia_schema.audit_log (
     request_id VARCHAR(100),
     application_name VARCHAR(50) DEFAULT 'vibesia_app',
     environment VARCHAR(20) DEFAULT 'production',
-    CONSTRAINT fk_app_user FOREIGN KEY (app_user_id) REFERENCES vibesia_schema.users(user_id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_audit_log_app_user_id ON vibesia_schema.audit_log (app_user_id);
