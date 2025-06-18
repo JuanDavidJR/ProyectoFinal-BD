@@ -1,354 +1,246 @@
-# 📊 Complex SQL Queries — MusicApp Vibesia
+# 🗃️ SQL Scripts — MusicApp Vibesia
 
-This folder contains a set of **advanced analytical queries** written in PostgreSQL, designed to extract meaningful insights from the `vibesia_schema` database. These queries support user behavior analysis, artist and playlist evaluation, churn prediction, and rating correlations — all aimed at enhancing understanding of the digital music ecosystem.
-
-> Each query includes descriptive headers, techniques used, and performance considerations. They were developed as part of the **MusicApp - Vibesia** university final project.
+This directory contains all SQL assets used to define, manage, and query the database schema for the **MusicApp Vibesia** project. It is structured to separate DDL, DML, stored procedures, functions, pipelines, and complex queries for better maintainability and automation.
 
 ---
 
-## 📁 Query List & Descriptions
+## 📁 Directory Structure
 
-| File                    | Query Title                                              | Focus Area                         |
-|-------------------------|-----------------------------------------------------------|------------------------------------|
-| `01-complex-query.sql`  | 🎼 Seasonal Trends Analysis                               | Genre/Artist/Album Seasonality     |
-| `02-complex-query.sql`  | 🌟 Influential User Discovery                             | Engagement & Activity              |
-| `03-complex-query.sql`  | 💿 Album Cohesion & Duration                              | Album Quality & Consistency        |
-| `05-complex-query.sql`  | 🧠 User Loyalty Segmentation                              | Playback Habits & Retention        |
-| `06-complex-query.sql`  | 🎤 Artist Performance Metrics                              | Popularity, Reach & Growth         |
-| `07-complex-query.sql`  | 📂 Playlist Analysis & Curation Quality                   | Composition, Popularity & Activity |
-| `08-complex-query.sql`  | 📈 Rating Correlation by Context                          | Device, Time, Behavior Analysis    |
-| `09-complex-query.sql`  | 🔗 Musical Ecosystem: Artist & Genre Connections          | Listener Overlap & Network Effect  |
-| `10-complex-query.sql`  | 🚨 Predictive User Churn Analysis                         | Churn Scoring & Segmenting         |
-
----
-
-## 🧪 Query Highlights
-
-### `01-complex-query.sql`: **Seasonal Musical Trends**
-- **Purpose:** Detects seasonal popularity of genres, artists, and albums
-- **Metrics:** Rankings, growth rates, listener count, and average ratings
-- **Techniques:** Temporal analysis with `EXTRACT()`, window functions for trend comparison
-- **Business Value:** Identifies content to promote during specific seasons
-
-### `02-complex-query.sql`: **Influential User Discovery**
-- **Purpose:** Identifies top power users based on diverse engagement metrics
-- **Metrics:** Playlist creation, social sharing, listening diversity, activity consistency
-- **Techniques:** Correlated subqueries, multi-dimensional scoring algorithms
-- **Business Value:** Target users for beta features, ambassador programs
-
-### `03-complex-query.sql`: **Album Cohesion & Duration Report**
-- **Purpose:** Measures album quality through song duration consistency and engagement
-- **Metrics:** Duration variance, skip rates, completion rates, recent popularity
-- **Techniques:** Statistical functions (`STDDEV`), cohesion scoring
-- **Business Value:** Optimize album recommendations and curation
-
-### `05-complex-query.sql`: **User Loyalty Segmentation**
-- **Purpose:** Categorizes users by loyalty levels and engagement patterns
-- **Metrics:** Tenure, artist diversity, playlist activity, completion rates
-- **Techniques:** Multi-tier classification with `CASE` expressions
-- **Business Value:** Personalized retention strategies and feature rollouts
-
-### `06-complex-query.sql`: **Artist Performance Dashboard**
-- **Purpose:** Comprehensive artist analytics for growth and engagement tracking
-- **Metrics:** Global rankings, country-specific performance, growth trends
-- **Techniques:** Window functions, geographic segmentation, time-series analysis
-- **Business Value:** Data-driven artist promotion and partnership decisions
-
-### `07-complex-query.sql`: **Playlist Quality & Activity Report**
-- **Purpose:** Evaluates playlist curation quality and user engagement
-- **Metrics:** Genre/artist diversity, song popularity, update frequency, user interaction
-- **Techniques:** Diversity indices, activity classification, engagement scoring
-- **Business Value:** Improve playlist recommendations and curator identification
-
-### `08-complex-query.sql`: **Rating Contextual Analysis**
-- **Purpose:** Analyzes how listening context affects user satisfaction
-- **Metrics:** Device-specific ratings, time-of-day patterns, familiarity impact
-- **Techniques:** Contextual correlation analysis, temporal grouping
-- **Business Value:** Optimize user experience across different contexts
-
-### `09-complex-query.sql`: **Musical Ecosystem: Artist & Genre Connections**
-- **Purpose:** Maps interconnections between artists and genres through shared audiences
-- **Metrics:** Listener overlap, crossover patterns, network strength
-- **Techniques:** Graph-like analysis with self-joins, connection strength algorithms
-- **Business Value:** Enhanced recommendation systems and genre discovery
-
-### `10-complex-query.sql`: **Predictive User Churn Analysis**
-- **Purpose:** Identifies users at risk of churning and suggests intervention strategies
-- **Metrics:** Churn probability score, engagement decline patterns, risk segmentation
-- **Techniques:** Predictive scoring, trend analysis, behavioral pattern recognition
-- **Business Value:** Proactive retention campaigns and user re-engagement
-
----
-
-## 🛠️ Advanced SQL Techniques Used
-
-### **Query Optimization**
-- **CTEs (Common Table Expressions):** Modular query composition for readability
-- **Window Functions:** `RANK()`, `DENSE_RANK()`, `LAG()`, `LEAD()` for rankings and trends
-- **Partitioning:** `PARTITION BY` for grouped calculations
-
-### **Data Analysis**
-- **Statistical Functions:** `STDDEV()`, `PERCENTILE_CONT()`, `CORR()` for data insights
-- **Temporal Analysis:** `INTERVAL`, `EXTRACT()`, `DATE_TRUNC()` for time-based patterns
-- **Aggregation Techniques:** Complex `GROUP BY` with `ROLLUP` and `CUBE`
-
-### **Advanced Joins & Subqueries**
-- **Correlated Subqueries:** Row-wise personalized metrics
-- **Self-Joins:** Graph-like relationship analysis
-- **Lateral Joins:** Dynamic row-level computations
-
-### **Classification & Scoring**
-- **Multi-Conditional CASE:** Complex business logic implementation
-- **Scoring Algorithms:** Weighted metrics for user and content evaluation
-- **Segmentation Logic:** Automated categorization based on behavioral patterns
-
----
-
-## 🎯 Performance Considerations
-
-### **Indexing Strategy**
-```sql
--- Recommended indexes for optimal query performance
-CREATE INDEX idx_playback_history_user_date ON playback_history(user_id, played_at);
-CREATE INDEX idx_playback_history_song_date ON playback_history(song_id, played_at);
-CREATE INDEX idx_songs_artist_album ON songs(artist_id, album_id);
-CREATE INDEX idx_playlist_songs_composite ON playlist_songs(playlist_id, song_id);
 ```
-
-### **Query Optimization Tips**
-- Use `LIMIT` for large result sets during development
-- Consider materialized views for frequently accessed aggregations
-- Monitor query execution plans with `EXPLAIN ANALYZE`
-- Implement query result caching for dashboard applications
-
----
-
-## 🧩 System Requirements
-
-### **Database**
-- **PostgreSQL:** Version 14 or higher
-- **Schema:** `vibesia_schema`
-- **Extensions:** `pg_stat_statements` (recommended for performance monitoring)
-
-### **Required Tables**
-- Core entities: `users`, `songs`, `albums`, `artists`, `genres`
-- Relationships: `song_genres`, `playlist_songs`, `user_devices`
-- Activity tracking: `playback_history`, `user_ratings`
-- Metadata: `devices`, `playlists`
-
-### **Minimum Data Requirements**
-- **Users:** 1,000+ for meaningful segmentation
-- **Songs:** 10,000+ for diversity analysis
-- **Playback History:** 100,000+ events for trend analysis
-- **Ratings:** 10,000+ for correlation analysis
-
----
-
-## 🚀 Usage Instructions
-
-### **Single Query Execution**
-```bash
-# Execute individual query
-psql -U postgres -d vibesia_db -f 01-complex-query.sql
-
-# With output formatting
-psql -U postgres -d vibesia_db -f 01-complex-query.sql --csv > results.csv
-```
-
-### **Batch Execution**
-```bash
-# Run all queries in sequence
-for file in *.sql; do
-    echo "Executing $file..."
-    psql -U postgres -d vibesia_db -f "$file"
-done
-```
-
-### **Performance Monitoring**
-```sql
--- Enable query statistics
-SELECT pg_stat_statements_reset();
-
--- After running queries, check performance
-SELECT query, calls, total_time, mean_time 
-FROM pg_stat_statements 
-WHERE query LIKE '%vibesia_schema%'
-ORDER BY total_time DESC;
+sql/
+├── ddl/                  # Schema definition scripts
+├── dml/                  # Data insertion, audit logic, stored procedures and functions
+├── pipelines/            # Batch scripts for automated execution
+├── queries/              # Complex SQL queries for reporting and analysis
+└── README.md             # You are here
 ```
 
 ---
 
-## 📈 Business Intelligence Integration
+## 📐 `ddl/` — Data Definition Language
 
-### **Dashboard Integration**
-These queries are designed to integrate with popular BI tools:
-- **Tableau:** Direct PostgreSQL connection
-- **Power BI:** PostgreSQL connector
-- **Grafana:** PostgreSQL data source
-- **Metabase:** Native PostgreSQL support
+> Contains all scripts related to the creation and alteration of the database structure.
 
-### **API Integration**
-```python
-# Example Python integration
-import psycopg2
-import pandas as pd
-
-def run_complex_query(query_file):
-    conn = psycopg2.connect(
-        host="localhost",
-        database="vibesia_db",
-        user="postgres"
-    )
-    
-    with open(f"queries/{query_file}", 'r') as file:
-        query = file.read()
-    
-    return pd.read_sql_query(query, conn)
-
-# Usage
-results = run_complex_query("01-complex-query.sql")
-```
+| File                        | Purpose |
+|-----------------------------|---------|
+| `01-create-database.sql`    | Creates the initial database instance. |
+| `02-create-tables.sql`      | Defines all system tables. |
+| `03-create-triggers.sql`    | Includes triggers for automatic audit logging. |
+| `04-alter-tables.sql`       | Performs alterations such as constraints and foreign keys. |
+| `.gitkeep`                  | Keeps folder tracked in Git when empty. |
+| `README.md`                 | Additional context for DDL scripts. |
 
 ---
 
-## 🎓 Educational Value & Learning Outcomes
+## 🧩 `dml/` — Data Manipulation, Functions, Procedures, Audit
 
-### **SQL Mastery**
-- **Advanced Joins:** Complex multi-table relationships
-- **Window Functions:** Ranking, partitioning, and analytical functions
-- **Subquery Optimization:** Correlated and lateral subqueries
-- **Performance Tuning:** Index usage and query optimization
+> This folder is divided into four subfolders for clarity:
 
-### **Data Analysis Skills**
-- **Statistical Analysis:** Correlation, variance, and distribution analysis
-- **Trend Identification:** Temporal pattern recognition
-- **Segmentation Techniques:** User and content categorization
-- **Predictive Modeling:** Churn prediction and scoring algorithms
+### 📦 `dml/data/`
+Contains scripts to populate the system with base data.
 
-### **Business Intelligence**
-- **KPI Development:** Music industry metrics and benchmarks
-- **User Behavior Analysis:** Engagement and retention patterns
-- **Content Performance:** Artist and playlist analytics
-- **Market Intelligence:** Genre trends and seasonal patterns
+| File                 | Description                     |
+|----------------------|----------------------------------|
+| `01-genres.sql`      | List of music genres             |
+| `02-artists.sql`     | Initial artist records           |
+| `03-albums.sql`      | Albums associated with artists   |
+| `04-music.sql`       | Songs linked to albums           |
+| `05-song-genres.sql` | Mapping songs to genres          |
+| `06-users.sql`       | Application users                |
+| `07-devices.sql`     | User devices                     |
+| `08-user-device.sql` | Relationship: user ↔ device      |
+| `09-playlists.sql`   | Playlist records                 |
+| `10-playlist-song.sql` | Songs in playlists            |
+| `11-reproductions.sql` | Song play history             |
+
+---
+
+### 🔐 `dml/audit/`
+> Audit logging structure and test cases.
+
+| File                   | Description                          |
+|------------------------|--------------------------------------|
+| `audit-examples.sql`   | Query examples for using `audit_log` |
+| `README.md`            | Documentation of audit logging usage |
+
+---
+
+### 🧠 `dml/functions/`
+> SQL functions used by backend and reporting systems.
+
+| Function File               | Description                                  |
+|-----------------------------|----------------------------------------------|
+| `audit-function.sql`        | Automatically logs changes to audit table    |
+| `create-playlist.sql`       | Creates playlists programmatically           |
+| `get-client_ip.sql`         | Returns client IP address                    |
+| `get-most-active-user.sql`  | Determines user with most plays              |
+| `get-top-song.sql`          | Returns the most played song overall         |
+| `helper-backend-functions.sql` | Misc. helper functions for API/backend |
+
+---
+
+### ⚙️ `dml/procedures-stored/`
+> Stored procedures for user interactions in the app.
+
+| Procedure File                 | Description                             |
+|--------------------------------|-----------------------------------------|
+| `sp_add_song_to_playlist.sql`  | Adds a song to a playlist               |
+| `sp_remove_song_from_playlist.sql` | Removes a song from a playlist     |
+| `sp_delete_playlist.sql`       | Deletes an entire playlist              |
+| `sp_update_playlist.sql`       | Updates playlist metadata               |
+| `README.md`                    | Overview of procedures                  |
+
+---
+
+## 🔄 `pipelines/` — Batch Execution
+
+> Contains scripts for executing multiple SQL files in batch.
+
+### 📂 `pipelines/create-database/`
+Automates creation of the database from schema to triggers.
+
+### 📂 `pipelines/insert-data/`
+Sequential loading of base data and audit setup.
+
+⚙️ Pipelines may use shell scripts or psql batch execution for automation.
+
+---
+
+## 📊 `queries/` — Complex SQL Queries
+
+> Advanced analytical queries for the final delivery.
+
+| File                      | Description                      |
+|---------------------------|----------------------------------|
+| `01-complex-query.sql` → `10-complex-query.sql` | Analytical queries showcasing system functionality |
+| `queries_vibesia.sql`     | Consolidated query set           |
+| `README.md`               | Query documentation and usage    |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- PostgreSQL 17.0+
+- psql command-line tool
+- Git (for version control)
+
+### Database Setup
+1. **Create Database:**
+   ```bash
+   psql -U postgres -f ddl/01-create-database.sql
+   ```
+
+2. **Run Full Pipeline:**
+   ```bash
+   # Execute complete database setup
+   ./pipelines/create-database/run-all.sh
+   
+   # Insert initial data
+   ./pipelines/insert-data/run-all.sh
+   ```
+
+3. **Test Installation:**
+   ```bash
+   psql -U postgres -d vibesia_db -f queries/01-complex-query.sql
+   ```
+
+---
+
+## 🧪 Development Notes
+
+- All scripts are compatible with **PostgreSQL 17.0+**.
+- SQL files are modular, organized by responsibility.
+- Most DDL/DML scripts can be run independently or via batch pipelines.
+- Audit functionality is triggered automatically on data changes.
+- Read `sql/dml/audit/README.md` for full audit tracking system.
+
+### Naming Conventions
+- **DDL files:** Numbered sequentially (`01-`, `02-`, etc.)
+- **DML data files:** Sequential loading order
+- **Functions:** Descriptive names with hyphen separation
+- **Stored procedures:** Prefixed with `sp_`
+
+### Best Practices
+- Always backup database before running DDL alterations
+- Test functions and procedures in development environment first
+- Use transactions for batch data operations
+- Monitor audit logs for system changes
+
+---
+
+## 🎓 Educational Objective
+
+This SQL architecture supports the academic goal of building a robust and observable PostgreSQL database system capable of:
+
+- **Normalized Structure:** Proper relational design with foreign keys
+- **Modular Organization:** Clear separation of concerns (DDL/DML/Functions)
+- **Audit Logging:** Complete change tracking and accountability
+- **Backend Integration:** Functions and procedures ready for API consumption
+- **Analytics Ready:** Complex queries for insights and reporting
+- **Scalable Design:** Pipeline automation for deployment and maintenance
 
 ---
 
 ## 🔧 Troubleshooting
 
-### **Common Issues**
+### Common Issues
 
-**Query Timeout:**
-```sql
--- Increase statement timeout
-SET statement_timeout = '5min';
+**Database Connection Errors:**
+```bash
+# Check PostgreSQL service status
+sudo systemctl status postgresql
+
+# Verify user permissions
+psql -U postgres -c "\du"
 ```
 
-**Memory Issues:**
-```sql
--- Increase work memory for complex queries
-SET work_mem = '256MB';
+**Script Execution Failures:**
+```bash
+# Run with verbose output
+psql -U postgres -d vibesia_db -v ON_ERROR_STOP=1 -f yourscript.sql
 ```
 
-**Index Missing:**
-```sql
--- Check if indexes exist
-SELECT schemaname, tablename, indexname 
-FROM pg_indexes 
-WHERE schemaname = 'vibesia_schema';
-```
-
-### **Data Quality Checks**
-```sql
--- Verify data completeness
-SELECT 
-    'users' as table_name, COUNT(*) as record_count 
-FROM vibesia_schema.users
-UNION ALL
-SELECT 
-    'playback_history', COUNT(*) 
-FROM vibesia_schema.playback_history;
-```
+**Audit Function Not Triggering:**
+- Verify triggers are installed: `\dt` in psql
+- Check function permissions and syntax
+- Review `dml/audit/README.md` for debugging steps
 
 ---
 
-## 📚 Related Documentation
+## 📈 Performance Considerations
 
-### **Project Structure**
-- **Database Schema:** `../ddl/README.md`
-- **Functions & Procedures:** `../dml/functions/README.md`
-- **Audit System:** `../dml/audit/README.md`
-- **Data Pipeline:** `../pipelines/README.md`
-
-### **External Resources**
-- [PostgreSQL Window Functions](https://www.postgresql.org/docs/current/functions-window.html)
-- [SQL Performance Tuning Guide](https://www.postgresql.org/docs/current/performance-tips.html)
-- [Music Industry Analytics Best Practices](https://musicindustryresearch.org/)
+- **Indexing:** Primary keys and foreign keys are automatically indexed
+- **Audit Impact:** Audit triggers add ~5-10% overhead to DML operations
+- **Query Optimization:** Use `EXPLAIN ANALYZE` for complex queries
+- **Connection Pooling:** Recommended for production deployments
 
 ---
 
-## 🤝 Contributing
+## 📬 Contributions & Issues
 
-### **Query Development Guidelines**
-1. **Documentation:** Include comprehensive header comments
-2. **Performance:** Test with realistic data volumes
-3. **Modularity:** Use CTEs for complex logic breakdown
-4. **Validation:** Include data quality checks
-5. **Testing:** Provide expected output samples
+This folder is maintained by the **MusicApp Vibesia** development team for a university project. 
 
-### **Code Review Checklist**
-- [ ] Query executes without errors
-- [ ] Results are logically consistent
-- [ ] Performance is acceptable (< 30 seconds)
-- [ ] Documentation is complete
-- [ ] Indexes are properly utilized
+### Contributing
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-sql-function`)
+3. Test your SQL scripts thoroughly
+4. Commit with descriptive messages
+5. Submit a pull request
 
----
-
-## 📊 Query Performance Benchmarks
-
-| Query File | Typical Runtime | Memory Usage | Complexity |
-|------------|----------------|--------------|------------|
-| `01-complex-query.sql` | 15-25 seconds | 128MB | High |
-| `02-complex-query.sql` | 8-12 seconds | 64MB | Medium |
-| `03-complex-query.sql` | 10-18 seconds | 96MB | Medium |
-| `05-complex-query.sql` | 12-20 seconds | 112MB | High |
-| `06-complex-query.sql` | 18-30 seconds | 156MB | High |
-| `07-complex-query.sql` | 14-22 seconds | 128MB | Medium |
-| `08-complex-query.sql` | 16-28 seconds | 144MB | High |
-| `09-complex-query.sql` | 20-35 seconds | 192MB | Very High |
-| `10-complex-query.sql` | 22-40 seconds | 208MB | Very High |
-
-*Benchmarks based on database with 1M+ users, 10M+ songs, 100M+ playback events*
+### Reporting Issues
+Please open an issue in the [main repository](https://github.com/JuanDavidJR/ProyectoFinal-BD.git) with:
+- SQL script filename
+- PostgreSQL version
+- Error message (if any)
+- Expected vs. actual behavior
 
 ---
 
-## 📬 Support & Contact
+## 📝 License
 
-### **Development Team**
-- **Project:** MusicApp - Vibesia
-- **Institution:** Universidad de Sistemas
-- **Course:** Bases de Datos Avanzadas
-- **Repository:** [GitHub - ProyectoFinal-BD](https://github.com/JuanDavidJR/ProyectoFinal-BD)
-
-### **Getting Help**
-1. **Documentation:** Check related README files first
-2. **Issues:** Open GitHub issue with query file and error details
-3. **Discussions:** Use GitHub discussions for general questions
-4. **Performance:** Include `EXPLAIN ANALYZE` output for optimization help
+This project is developed for educational purposes as part of a university database course. All code is available under the MIT License for learning and academic use.
 
 ---
 
-## 📜 License & Academic Use
-
-This project is developed for educational purposes as part of a university database systems course. All queries and documentation are available under the MIT License for learning and academic use.
-
-**Citation:**
-```
-MusicApp Vibesia - Advanced SQL Query Collection
-Universidad de Sistemas - Bases de Datos Avanzadas
-GitHub: https://github.com/JuanDavidJR/ProyectoFinal-BD
-```
-
----
-
-**Built with 🎵 and ⚡ by the Ad-Astra Team**
+**Made with ❤️ by the Vibesia Team**

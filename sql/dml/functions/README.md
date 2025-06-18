@@ -4,91 +4,75 @@
 
 ---
 
-## 📚 Índice
+## 🚀 Introduction
 
-* [🚀 Introducción](#-introducción)
-* [🎯 Objetivos](#-objetivos)
-* [✨ Características](#-características)
-* [🏗 Requisitos](#-requisitos)
-* [⚙ Instalación](#-instalación)
-* [🧠 Uso](#-uso)
-* [🧪 Pruebas y Desarrollo](#-pruebas-y-desarrollo)
-* [🛡 Mejores Prácticas](#-mejores-prácticas)
-* [🤝 Contribuciones](#-contribuciones)
-* [📄 Licencia](#-licencia)
-* [🙋 Soporte](#-soporte)
+This repository contains a modular library of PostgreSQL functions designed to integrate with Vibesia, a music management platform. It is oriented towards facilitating the development of robust applications through an advanced system of auditing, user management, and real-time analytics.
 
 ---
 
-## 🚀 Introducción
+## 🎯 Objectives
 
-Este repositorio contiene una biblioteca modular de funciones PostgreSQL diseñadas para integrarse con Vibesia, una plataforma de gestión musical. Está orientado a facilitar el desarrollo de aplicaciones robustas mediante un sistema avanzado de auditoría, gestión de usuarios y análisis en tiempo real.
-
----
-
-## 🎯 Objetivos
-
-* Brindar funciones reutilizables para facilitar la lógica del backend.
-* Ofrecer herramientas de trazabilidad, seguridad y monitoreo de usuarios.
-* Permitir estadísticas de comportamiento y reproducción de contenido.
+* Provide reusable functions to facilitate backend logic.
+* Offer tools for traceability, security, and user monitoring.
+* Enable behavioral statistics and content playback tracking.
 
 ---
 
-## ✨ Características
+## ✨ Features
 
-### 🔍 Auditoría y Seguridad
+### 🔍 Auditing and Security
 
-* Registro de operaciones con contexto de aplicación.
-* Variables de sesión para trazabilidad.
-* Soporte de compatibilidad con sistemas existentes de auditoría.
+* Operation logging with application context.
+* Session variables for traceability.
+* Compatibility support with existing audit systems.
 
-### 👥 Gestión de Usuarios
+### 👥 User Management
 
-* Creación de listas de reproducción con validación.
-* Seguimiento de actividad por usuario.
-* Control de acceso basado en roles.
+* Playlist creation with validation.
+* User activity tracking.
+* Role-based access control.
 
-### 📊 Analítica y Reportes
+### 📊 Analytics and Reports
 
-* Identificación de usuarios más activos.
-* Canciones más reproducidas.
-* Análisis del historial de reproducción.
-* Estadísticas en tiempo real.
+* Most active user identification.
+* Most played songs.
+* Playback history analysis.
+* Real-time statistics.
 
-### 🛠 Utilidades para Desarrolladores
+### 🛠 Developer Utilities
 
-* Funciones auxiliares para integración backend.
-* Gestión de contexto por sesión.
-* Validación de errores.
+* Helper functions for backend integration.
+* Session context management.
+* Error validation.
 
 ---
 
-## 🏗 Requisitos
+## 🏗 Requirements
 
-### Tecnologías
+### Technologies
 
-* PostgreSQL 12 o superior
+* PostgreSQL 12 or higher
 
-### Estructura Base
+### Base Structure
 
-Asegúrate de tener las siguientes tablas (pueden variar según implementación):
+Make sure you have the following tables (may vary depending on implementation):
 
 ```sql
--- Estructura requerida (simplificada)
+-- Required structure (simplified)
 -- audit_log, users, playlists, songs, playback_history
 ```
 
 ---
 
-## ⚙ Instalación
+## ⚙ Installation
 
-### Paso a paso
+### Step by step
 
 ```sql
--- 1. Crear esquema si no existe
+-- 1. Create schema if it doesn't exist
 CREATE SCHEMA IF NOT EXISTS vibesia_schema;
 
--- 2. Instalar funciones en orden
+-- 2. Install functions in order
 \i functions/get-client_ip.sql
 \i functions/helper-backend-functions.sql
 \i functions/audit-function.sql
@@ -99,34 +83,34 @@ CREATE SCHEMA IF NOT EXISTS vibesia_schema;
 
 ---
 
-## 🧠 Uso
+## 🧠 Usage
 
-### Crear Playlist
+### Create Playlist
 
 ```sql
--- Establecer contexto de auditoría
+-- Set audit context
 SELECT vibesia_schema.set_audit_context(
   456, 'creator@music.com', 'user',
   'MusicApp/1.0', '/api/playlists', 'req-456'
 );
 
--- Crear playlist
+-- Create playlist
 SELECT * FROM vibesia_schema.sp_create_playlist(
   456, 'Summer Hits 2024', 'Best songs for summer', 'public'
 );
 
--- Limpiar contexto
+-- Clear context
 SELECT vibesia_schema.clear_audit_context();
 ```
 
-### Obtener Estadísticas
+### Get Statistics
 
 ```sql
 SELECT * FROM vibesia_schema.get_most_active_user();
 SELECT * FROM vibesia_schema.get_top_song();
 ```
 
-### Consulta Compuesta para Dashboard
+### Composite Query for Dashboard
 
 ```sql
 WITH user_stats AS (
@@ -150,70 +134,70 @@ FROM song_stats;
 
 ---
 
-## 🧪 Pruebas y Desarrollo
+## 🧪 Testing and Development
 
 ```sql
 DO $$
 BEGIN
     RAISE NOTICE 'IP: %', vibesia_schema.get_client_ip();
     PERFORM vibesia_schema.set_audit_context(999, 'test@test.com', 'test');
-    RAISE NOTICE 'Contexto OK';
+    RAISE NOTICE 'Context OK';
     PERFORM vibesia_schema.clear_audit_context();
-    RAISE NOTICE 'Contexto limpiado';
+    RAISE NOTICE 'Context cleared';
 END $$;
 ```
 
 ---
 
-## 🛡 Mejores Prácticas
+## 🛡 Best Practices
 
-### Seguridad
+### Security
 
-* Validar parámetros de entrada.
-* Usar variables de sesión para aplicaciones multiusuario.
-* Implementar control de errores.
+* Validate input parameters.
+* Use session variables for multi-user applications.
+* Implement error handling.
 
-### Rendimiento
+### Performance
 
-* Indexar columnas clave del log de auditoría.
-* Usar particiones por fecha.
-* Hacer uso de pool de conexiones.
-* Medir tiempos de ejecución.
+* Index key columns in audit log.
+* Use date-based partitioning.
+* Make use of connection pooling.
+* Measure execution times.
 
-### Desarrollo
+### Development
 
-* Probar en entornos de staging.
-* Documentar cambios en el esquema.
-* Seguir convención de nombres y comentarios claros.
-
----
-
-## 🤝 Contribuciones
-
-¡Bienvenido a colaborar! Sigue estos pasos:
-
-1. Haz un *fork* del repositorio.
-2. Crea tu rama: `git checkout -b feature/NuevaFuncionalidad`
-3. Asegúrate de *probar* tus cambios.
-4. Haz commit: `git commit -m 'Agrega nueva funcionalidad X'`
-5. Push a tu fork: `git push origin feature/NuevaFuncionalidad`
-6. Abre un *Pull Request*.
-
-> ✳ Revisa los estándares de calidad de código y comentarios en cada función.
+* Test in staging environments.
+* Document schema changes.
+* Follow naming conventions and clear comments.
 
 ---
 
-## 📄 Licencia
+## 🤝 Contributions
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Welcome to collaborate! Follow these steps:
+
+1. Fork the repository.
+2. Create your branch: `git checkout -b feature/NewFeature`
+3. Make sure to test your changes.
+4. Commit: `git commit -m 'Add new feature X'`
+5. Push to your fork: `git push origin feature/NewFeature`
+6. Open a Pull Request.
+
+> ✳ Review the code quality standards and comments in each function.
 
 ---
 
-## 🙋 Soporte
+## 📄 License
 
-* 🐛 *Bugs*: [Issues](../../issues)
-* 💡 *Ideas y mejoras*: Usa [Discussions](../../discussions)
-* 📧 *Contacto*: Puedes dejar tu mensaje en los issues o comentar en los archivos fuente.
+This project is under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+## 🙋 Support
+
+* 🐛 Bugs: [Issues](../../issues)
+* 💡 Ideas and improvements: Use [Discussions](../../discussions)
+* 📧 Contact: You can leave your message in issues or comment on source files.
 
 ---
 
