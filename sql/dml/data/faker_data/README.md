@@ -125,20 +125,10 @@ The script assumes the existence of the following tables:
 
 ---  
 
-## � Author  
-
-Carlos Wilches  
-📫 [LinkedIn](https://linkedin.com) *(replace with your profile)*  
-🎓 Backend Developer & Data Engineer | PostgreSQL + Python Enthusiast  
-
----  
-
 ## 📄 License  
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.  
+This project is developed for educational purposes as part of a university database systems course. All queries and documentation are available under the MIT License for learning and academic use. 
 
-```  
-
----
+---  
 
 ⚠️ Warning: This script was tested on a Friday afternoon. It works. We don’t know *why*, but it works.
