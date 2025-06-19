@@ -225,9 +225,24 @@ ADD COLUMN hashed_password VARCHAR(255) NOT NULL DEFAULT 'temp_hash';
 -- 7. Add a column to mark whether the user is active or not
 ALTER TABLE vibesia_schema.users
 ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
---##################################################
---#               END DOCUMENTATION                #
---##################################################
+
+-- 8. Enable cascade delete for playlist songs
+ALTER TABLE vibesia_schema.playlist_songs
+DROP CONSTRAINT IF EXISTS playlist_songs_playlist_id_fkey; -- Drop if exists to avoid errors on re-run
+
+ALTER TABLE vibesia_schema.playlist_songs
+ADD CONSTRAINT playlist_songs_playlist_id_fkey
+FOREIGN KEY (playlist_id) REFERENCES vibesia_schema.playlists(playlist_id)
+ON DELETE CASCADE;
+
+-- 9. Enable cascade delete for user playlists
+ALTER TABLE vibesia_schema.playlists
+DROP CONSTRAINT IF EXISTS playlists_user_id_fkey; -- Drop if exists to avoid errors on re-run
+
+ALTER TABLE vibesia_schema.playlists
+ADD CONSTRAINT playlists_user_id_fkey
+FOREIGN KEY (user_id) REFERENCES vibesia_schema.users(user_id)
+ON DELETE CASCADE;
 
 --##################################################
 --#                AUDIT TABLE                     #
@@ -306,3 +321,6 @@ CREATE INDEX idx_playlist_songs_playlist_date_added ON vibesia_schema.playlist_s
 CREATE INDEX idx_songs_album_id_fk ON vibesia_schema.songs (album_id);
 CREATE INDEX idx_albums_artist_id_fk ON vibesia_schema.albums (artist_id);
 
+--##################################################
+--#               END DOCUMENTATION                #
+--##################################################
