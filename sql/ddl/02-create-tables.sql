@@ -193,55 +193,6 @@ ALTER TABLE vibesia_schema.user_device  ADD CONSTRAINT fk_user_device_devices
     FOREIGN KEY (device_id) REFERENCES vibesia_schema.devices(device_id)  
     ON UPDATE CASCADE ON DELETE CASCADE;
 
-
-
---##################################################
---#                AUDIT TABLE                     #
---##################################################
--- Table: vibesia_schema.audit_log
--- Brief: Audit table to track all CRUD operations on system tables
-CREATE TABLE vibesia_schema.audit_log (
-    audit_id SERIAL PRIMARY KEY,
-    db_user_name VARCHAR(100) NOT NULL DEFAULT SESSION_USER,
-    app_user_id INTEGER,                           
-    app_user_email VARCHAR(255),                     
-    app_user_role VARCHAR(50),
-    action_type VARCHAR(10) NOT NULL CHECK (action_type IN ('INSERT', 'UPDATE', 'DELETE')), 
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    table_name VARCHAR(50) NOT NULL,                
-    record_id INTEGER, 
-    old_values JSONB,                               
-    new_values JSONB, 
-    connection_ip INET,               
-    user_agent TEXT,                                 
-    api_endpoint VARCHAR(255),      
-    request_id VARCHAR(100),
-    application_name VARCHAR(50) DEFAULT 'vibesia_app',
-    environment VARCHAR(20) DEFAULT 'production',
-);
-
-CREATE INDEX idx_audit_log_app_user_id ON vibesia_schema.audit_log (app_user_id);
-CREATE INDEX idx_audit_log_timestamp ON vibesia_schema.audit_log (timestamp);
-CREATE INDEX idx_audit_log_table_name ON vibesia_schema.audit_log (table_name);
-CREATE INDEX idx_audit_log_action_type ON vibesia_schema.audit_log (action_type);
-CREATE INDEX idx_audit_log_record_id ON vibesia_schema.audit_log (table_name, record_id);
-
---##################################################
---#                CREATE INDEXES                  #
---##################################################
-
--- Indexes for improving search operations
-CREATE INDEX idx_artists_name ON vibesia_schema.artists(name);
-CREATE INDEX idx_albums_title ON vibesia_schema.albums(title);
-CREATE INDEX idx_songs_title ON vibesia_schema.songs(title);
-CREATE INDEX idx_playlists_user_id ON vibesia_schema.playlists(user_id);
-CREATE INDEX idx_playback_history_user_id ON vibesia_schema.playback_history(user_id);
-CREATE INDEX idx_playback_history_song_id ON vibesia_schema.playback_history(song_id);
-CREATE INDEX idx_playback_history_playback_date ON vibesia_schema.playback_history(playback_date);
-CREATE INDEX idx_user_device_user_id ON vibesia_schema.user_device(user_id);
-CREATE INDEX idx_user_device_device_id ON vibesia_schema.user_device(device_id);
-
-
 --##################################################
 --#               ALTER TABLES                     #
 --##################################################
@@ -277,3 +228,81 @@ ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
 --##################################################
 --#               END DOCUMENTATION                #
 --##################################################
+
+--##################################################
+--#                AUDIT TABLE                     #
+--##################################################
+-- Table: vibesia_schema.audit_log
+-- Brief: Audit table to track all CRUD operations on system tables
+CREATE TABLE vibesia_schema.audit_log (
+    audit_id SERIAL PRIMARY KEY,
+    db_user_name VARCHAR(100) NOT NULL DEFAULT SESSION_USER,
+    app_user_id INTEGER,                           
+    app_user_email VARCHAR(255),                     
+    app_user_role VARCHAR(50),
+    action_type VARCHAR(10) NOT NULL CHECK (action_type IN ('INSERT', 'UPDATE', 'DELETE')), 
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    table_name VARCHAR(50) NOT NULL,                
+    record_id INTEGER, 
+    old_values JSONB,                               
+    new_values JSONB, 
+    connection_ip INET,               
+    user_agent TEXT,                                 
+    api_endpoint VARCHAR(255),      
+    request_id VARCHAR(100),
+    application_name VARCHAR(50) DEFAULT 'vibesia_app',
+    environment VARCHAR(20) DEFAULT 'production'
+);
+
+CREATE INDEX idx_audit_log_app_user_id ON vibesia_schema.audit_log (app_user_id);
+CREATE INDEX idx_audit_log_timestamp ON vibesia_schema.audit_log (timestamp);
+CREATE INDEX idx_audit_log_table_name ON vibesia_schema.audit_log (table_name);
+CREATE INDEX idx_audit_log_action_type ON vibesia_schema.audit_log (action_type);
+CREATE INDEX idx_audit_log_record_id ON vibesia_schema.audit_log (table_name, record_id);
+
+--##################################################
+--#                CREATE INDEXES                  #
+--##################################################
+
+-- Indexes for improving search operations
+CREATE INDEX idx_playlists_user_id ON vibesia_schema.playlists(user_id);
+CREATE INDEX idx_playback_history_user_id ON vibesia_schema.playback_history(user_id);
+CREATE INDEX idx_playback_history_song_id ON vibesia_schema.playback_history(song_id);
+CREATE INDEX idx_playback_history_playback_date ON vibesia_schema.playback_history(playback_date);
+CREATE INDEX idx_user_device_user_id ON vibesia_schema.user_device(user_id);
+CREATE INDEX idx_user_device_device_id ON vibesia_schema.user_device(device_id);
+
+--##################################################
+--#            FUNCTIONAL INDEXES                  #
+--##################################################
+-- For efficient case-insensitive searches
+CREATE INDEX idx_users_username_lower ON vibesia_schema.users (LOWER(username));
+CREATE INDEX idx_users_email_lower ON vibesia_schema.users (LOWER(email));
+CREATE INDEX idx_artists_name_search ON vibesia_schema.artists (LOWER(name));
+CREATE INDEX idx_albums_title_search ON vibesia_schema.albums (LOWER(title));
+CREATE INDEX idx_songs_title_search ON vibesia_schema.songs (LOWER(title));
+CREATE INDEX idx_genres_name_lower ON vibesia_schema.genres (LOWER(name));
+CREATE INDEX idx_playlists_name_lower ON vibesia_schema.playlists (LOWER(name));
+
+--##################################################
+--#         COMPOSITE INDEXES FOR ANALYTICS       #
+--##################################################
+-- Playback history analytical indexes
+CREATE INDEX idx_playback_history_user_date ON vibesia_schema.playback_history (user_id, playback_date DESC);
+CREATE INDEX idx_playback_history_song_date ON vibesia_schema.playback_history (song_id, playback_date DESC);
+CREATE INDEX idx_playback_history_device_date ON vibesia_schema.playback_history (device_id, playback_date);
+CREATE INDEX idx_playback_history_q1_filters ON vibesia_schema.playback_history (completed, rating, playback_date);
+CREATE INDEX idx_q1_grouping_helper ON vibesia_schema.playback_history (song_id, user_id, playback_date);
+
+-- Specialized indexes for performance
+CREATE INDEX idx_users_only_active ON vibesia_schema.users (registration_date) WHERE is_active = TRUE;
+CREATE INDEX idx_artists_country_name_perf ON vibesia_schema.artists (country, name);
+CREATE INDEX idx_playlist_songs_playlist_date_added ON vibesia_schema.playlist_songs (playlist_id, date_added DESC);
+
+--##################################################
+--#            FOREIGN KEY INDEXES                 #
+--##################################################
+-- Additional FK indexes for join optimization
+CREATE INDEX idx_songs_album_id_fk ON vibesia_schema.songs (album_id);
+CREATE INDEX idx_albums_artist_id_fk ON vibesia_schema.albums (artist_id);
+
