@@ -91,16 +91,10 @@ The script assumes the existence of the following tables:
    source .venv/bin/activate  
    ```  
 
-    install dependencies
-
-   ```bash  
-   pip install psycopg2-binary faker numpy tqdm 
-   ```  
-
 2. Run the script:  
 
    ```bash  
-   python generate_playback_history.py  
+   python generate-data.py  
    ```  
 
 3. Output example:  
